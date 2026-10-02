@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CivilAI - by YSPM</title>
+<style>
+:root{--bg:#f8fafc;--card:#fff;--text:#0f172a;--mute:#64748b;--line:#e2e8f0;--pri:#2563EB;--ok:#16a34a;--bad:#dc2626}
+[data-theme=dark]{--bg:#0b1220;--card:#131c2e;--text:#e2e8f0;--mute:#94a3b8;--line:#243049}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
+nav{display:flex;align-items:center;gap:20px;padding:14px 24px;background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;flex-wrap:wrap}
+nav .logo{font-weight:800;font-size:1.3rem;color:var(--pri);margin-right:auto;text-decoration:none}
+nav a{color:var(--text);text-decoration:none;font-weight:500}
+nav a.active,nav a:hover{color:var(--pri)}
+button,.btn{background:var(--pri);color:#fff;border:0;padding:10px 18px;border-radius:8px;font-weight:600;cursor:pointer;font-size:.95rem;text-decoration:none;display:inline-block}
+button.alt{background:transparent;color:var(--pri);border:1px solid var(--pri)}
+main{max-width:1000px;margin:auto;padding:24px}
+.page{display:none}.page.on{display:block}
+.hero{text-align:center;padding:60px 10px}
+.hero h1{font-size:clamp(2rem,6vw,3.4rem);margin:0 0 12px}
+.hero h1 span{color:var(--pri)}
+.hero p{color:var(--mute);font-size:1.15rem;margin-bottom:24px}
+.grid{display:grid;gap:16px}
+.g3{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px}
+.card h3{margin:6px 0}.card p{color:var(--mute);margin:0}
+.icon{font-size:2rem}
+.metric b{display:block;font-size:1.6rem;color:var(--pri)}
+.metric span{color:var(--mute);font-size:.85rem}
+label{display:block;font-size:.85rem;color:var(--mute);margin:8px 0 4px}
+input,select{width:100%;padding:9px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);font-size:1rem}
+.row{display:grid;grid-template-columns:50px 1fr 1fr 1fr;gap:10px;align-items:end;margin-bottom:6px}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;margin:16px 0}
+th,td{padding:10px;text-align:right;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left}
+th{background:var(--pri);color:#fff}
+tr.total td{background:rgba(37,99,235,.12);font-weight:800}
+.badge{padding:3px 12px;border-radius:99px;color:#fff;font-weight:700;font-size:.8rem}
+.pass{background:var(--ok)}.fail{background:var(--bad)}
+.chk{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+.chk small{color:var(--mute);display:block}
+.banner{text-align:center;font-size:1.6rem;font-weight:800;color:#fff;padding:22px;border-radius:12px;margin-top:16px}
+h2{margin-top:0}
+.about{text-align:center;margin-top:40px}
+footer{text-align:center;padding:24px;color:var(--mute);border-top:1px solid var(--line);margin-top:40px}
+.hide{display:none}
+@media(max-width:600px){.row{grid-template-columns:30px 1fr 1fr 1fr;gap:6px}}
+@media print{nav,footer,button,.noprint{display:none!important}.page{display:none!important}.page.on{display:block!important}body{background:#fff;color:#000}}
+</style>
+</head>
+<body>
+<nav>
+  <a class="logo" href="#home">🏗️ CivilAI</a>
+  <a href="#boq" data-p="boq">BOQ</a>
+  <a href="#nbc" data-p="nbc">NBC</a>
+  <a href="#materials" data-p="materials">Materials</a>
+  <button class="alt" onclick="toggleTheme()">🌓</button>
+</nav>
+<main>
+
+<!-- LANDING -->
+<section id="home" class="page">
+  <div class="hero">
+    <h1>Civil Engineering Meets <span>AI</span></h1>
+    <p>Automate Estimation, BOQ &amp; Code Checking in Seconds</p>
+    <a class="btn" href="#boq">Launch Calculator</a>
+  </div>
+  <div class="grid g3">
+    <div class="card"><div class="icon">📋</div><h3>BOQ Generator</h3><p>Slab-wise volume, cement, sand and aggregate with totals and export.</p></div>
+    <div class="card"><div class="icon">✅</div><h3>NBC Code Checker</h3><p>Instant PASS/FAIL checks against NBC 2016 minimum requirements.</p></div>
+    <div class="card"><div class="icon">🧱</div><h3>Material Calculator</h3><p>Quick estimates for bricks, cement and steel.</p></div>
+  </div>
+  <div class="about card" style="margin-top:24px"><h2>About</h2><p>Built by YSPM Civil Student - Yashwantrao Chavan College</p></div>
+</section>
+
+<!-- BOQ -->
+<section id="boq" class="page">
+  <h2>BOQ Generator</h2>
+  <div class="card noprint">
+    <label>How many slabs? (1-20)</label>
+    <input type="number" id="slabCount" min="1" max="20" value="3" style="max-width:200px" oninput="buildRows()">
+    <div id="rows" style="margin-top:12px"></div>
+    <button onclick="calcBOQ()">Calculate</button>
+  </div>
+  <div id="boqOut" class="hide">
+    <div class="grid g4" id="metrics" style="margin-top:16px"></div>
+    <div class="tw"><table id="boqTable"></table></div>
+    <button onclick="downloadCSV()">⬇ Download as Excel (CSV)</button>
+    <button class="alt" onclick="window.print()">🖨 Download as PDF</button>
+  </div>
+</section>
+
+<!-- NBC -->
+<section id="nbc" class="page">
+  <h2>AI NBC 2016 Code Compliance Checker</h2>
+  <div class="card">
+    <label>Building Type</label>
+    <select id="btype"><option>Residential</option><option>Commercial</option></select>
+    <div class="grid g4">
+      <div><label>Staircase Width (m)</label><input type="number" id="stair" step="0.01" value="0.9"></div>
+      <div><label>Corridor Width (m)</label><input type="number" id="corr" step="0.01" value="1.1"></div>
+      <div><label>Ceiling Height (m)</label><input type="number" id="ceil" step="0.01" value="2.7"></div>
+      <div><label>Room Size (sqm)</label><input type="number" id="room" step="0.1" value="10"></div>
+    </div>
+    <br><button onclick="checkNBC()">Check Compliance</button>
+  </div>
+  <div id="nbcOut"></div>
+</section>
+
+<!-- MATERIALS -->
+<section id="materials" class="page">
+  <h2>Material Calculator</h2>
+  <div class="grid g3">
+    <div class="card"><h3>🧱 Bricks</h3>
+      <label>Wall Length (m)</label><input type="number" id="bl" value="10">
+      <label>Wall Height (m)</label><input type="number" id="bh" value="3">
+      <label>Wall Thickness (m)</label><input type="number" id="bt" value="0.23" step="0.01">
+      <br><br><button onclick="calcBrick()">Calculate</button><p id="brickOut" style="margin-top:10px"></p></div>
+    <div class="card"><h3>🏭 Cement</h3>
+      <label>Concrete Volume (m³)</label><input type="number" id="cv" value="5">
+      <label>Bags per m³</label><input type="number" id="cb" value="7">
+      <br><br><button onclick="calcCement()">Calculate</button><p id="cemOut" style="margin-top:10px"></p></div>
+    <div class="card"><h3>🔩 Steel</h3>
+      <label>Concrete Volume (m³)</label><input type="number" id="sv" value="5">
+      <label>Steel kg per m³</label><input type="number" id="sk" value="80">
+      <br><br><button onclick="calcSteel()">Calculate</button><p id="steelOut" style="margin-top:10px"></p></div>
+  </div>
+  <p class="noprint" style="color:var(--mute);font-size:.85rem">Approximate estimates for learning/preliminary use. Brick count assumes about 500 bricks per m³ of masonry including mortar.</p>
+</section>
+
+</main>
+<footer>Built with ❤️ by YSPM Student | Civil + AI</footer>
+
+<script>
+const $ = id => document.getElementById(id);
+const f = (n, d=2) => Number(n).toFixed(d);
+
+/* Theme + routing */
+function toggleTheme(){
+  const t = document.documentElement.dataset.theme === 'dark' ? '' : 'dark';
+  document.documentElement.dataset.theme = t;
+  try{ localStorage.setItem('theme', t); }catch(e){}
+}
+try{ document.documentElement.dataset.theme = localStorage.getItem('theme') || ''; }catch(e){}
+function route(){
+  const p = (location.hash || '#home').slice(1);
+  document.querySelectorAll('.page').forEach(s => s.classList.toggle('on', s.id === p));
+  document.querySelectorAll('nav a[data-p]').forEach(a => a.classList.toggle('active', a.dataset.p === p));
+  if(!document.querySelector('.page.on')) $('home').classList.add('on');
+  window.scrollTo(0,0);
+}
+window.addEventListener('hashchange', route);
+
+/* BOQ */
+const dummy = [[5,4,0.15],[6,3.5,0.15],[4,4,0.12]];
+function buildRows(){
+  let n = Math.min(20, Math.max(1, parseInt($('slabCount').value) || 1));
+  let h = '';
+  for(let i=0;i<n;i++){
+    const d = dummy[i] || [5,4,0.15];
+    h += `<div class="row"><b>S${i+1}</b>
+      <div><label>Length (m)</label><input type="number" step="0.01" class="L" value="${d[0]}"></div>
+      <div><label>Width (m)</label><input type="number" step="0.01" class="W" value="${d[1]}"></div>
+      <div><label>Thickness (m)</label><input type="number" step="0.01" class="T" value="${d[2]}"></div></div>`;
+  }
+  $('rows').innerHTML = h;
+}
+let boqData = [];
+function calcBOQ(){
+  const L = [...document.querySelectorAll('.L')], W = [...document.querySelectorAll('.W')], T = [...document.querySelectorAll('.T')];
+  boqData = L.map((_,i) => {
+    const v = (+L[i].value||0) * (+W[i].value||0) * (+T[i].value||0);
+    return {n:'Slab '+(i+1), l:+L[i].value, w:+W[i].value, t:+T[i].value, v, c:v*7, s:v*0.42, a:v*0.84};
+  });
+  const sum = k => boqData.reduce((a,r)=>a+r[k],0);
+  const tot = {v:sum('v'), c:sum('c'), s:sum('s'), a:sum('a')};
+  $('metrics').innerHTML = [
+    ['Total Volume', f(tot.v,3)+' m³'], ['Total Cement', f(tot.c,1)+' bags'],
+    ['Total Sand', f(tot.s,3)+' m³'], ['Total Aggregate', f(tot.a,3)+' m³']
+  ].map(m => `<div class="card metric"><b>${m[1]}</b><span>${m[0]}</span></div>`).join('');
+  $('boqTable').innerHTML = `<tr><th>Slab</th><th>L (m)</th><th>W (m)</th><th>T (m)</th><th>Volume (m³)</th><th>Cement (bags)</th><th>Sand (m³)</th><th>Aggregate (m³)</th></tr>` +
+    boqData.map(r => `<tr><td>${r.n}</td><td>${f(r.l)}</td><td>${f(r.w)}</td><td>${f(r.t)}</td><td>${f(r.v,3)}</td><td>${f(r.c,1)}</td><td>${f(r.s,3)}</td><td>${f(r.a,3)}</td></tr>`).join('') +
+    `<tr class="total"><td colspan="4">TOTAL</td><td>${f(tot.v,3)}</td><td>${f(tot.c,1)}</td><td>${f(tot.s,3)}</td><td>${f(tot.a,3)}</td></tr>`;
+  $('boqOut').classList.remove('hide');
+  boqData.total = tot;
+}
+function downloadCSV(){
+  if(!boqData.length) return;
+  let csv = 'Slab,Length (m),Width (m),Thickness (m),Volume (m3),Cement (bags),Sand (m3),Aggregate (m3)\n';
+  boqData.forEach(r => csv += [r.n,r.l,r.w,r.t,f(r.v,3),f(r.c,1),f(r.s,3),f(r.a,3)].join(',') + '\n');
+  const t = boqData.total;
+  csv += ['TOTAL','','','',f(t.v,3),f(t.c,1),f(t.s,3),f(t.a,3)].join(',') + '\n';
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'}));
+  a.download = 'BOQ.csv'; a.click();
+}
+
+/* NBC */
+function checkNBC(){
+  const res = $('btype').value === 'Residential';
+  const stair = +$('stair').value, corr = +$('corr').value, ceil = +$('ceil').value, room = +$('room').value;
+  const checks = [
+    ['Staircase Width', stair, res?1.0:1.5, 'm'],
+    ['Corridor Width', corr, res?1.0:1.5, 'm'],
+    ['Ceiling Height', ceil, 2.4, 'm'],
+    ['Room Size', room, 9.5, 'sqm']
+  ];
+  let ok = true, h = '<div class="card" style="margin-top:16px">';
+  checks.forEach(c => {
+    const p = c[1] >= c[2]; if(!p) ok = false;
+    h += `<div class="chk"><div><b>${c[0]}</b><small>${p ? `${c[1]} ${c[3]} meets minimum of ${c[2]} ${c[3]}`
+      : `Provided ${c[1]} ${c[3]} is below the minimum of ${c[2]} ${c[3]} (short by ${f(c[2]-c[1])} ${c[3]})`}</small></div>
+      <span class="badge ${p?'pass':'fail'}">${p?'PASS':'FAIL'}</span></div>`;
+  });
+  h += '</div><div class="banner" style="background:var(--' + (ok?'ok':'bad') + ')">' + (ok?'✅ COMPLIANT':'❌ NON-COMPLIANT') + '</div>';
+  $('nbcOut').innerHTML = h;
+}
+
+/* Materials */
+function calcBrick(){
+  const vol = $('bl').value * $('bh').value * $('bt').value;
+  $('brickOut').innerHTML = `Masonry: <b>${f(vol,2)} m³</b><br>Bricks needed: <b>${Math.ceil(vol*500)}</b>`;
+}
+function calcCement(){
+  $('cemOut').innerHTML = `Cement: <b>${Math.ceil($('cv').value * $('cb').value)} bags</b> (50 kg each)`;
+}
+function calcSteel(){
+  const kg = $('sv').value * $('sk').value;
+  $('steelOut').innerHTML = `Steel: <b>${f(kg,0)} kg</b> (${f(kg/1000,3)} tonnes)`;
+}
+
+buildRows(); calcBOQ(); checkNBC(); calcBrick(); calcCement(); calcSteel(); route();
+</script>
+</body>
+</html>
